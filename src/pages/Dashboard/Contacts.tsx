@@ -129,6 +129,7 @@ const Contacts = () => {
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   const customerRatio = useMemo(() => {
     if (!counts.total) return "0%";
@@ -280,42 +281,36 @@ const Contacts = () => {
     }
   };
 
-  const exportCsv = () => {
-    const headers = [
-      "Name",
-      "Email",
-      "Phone",
-      "Company",
-      "Status",
-      "Notes",
-      "Created At",
-      "Updated At",
-    ];
+  const exportCsv = async () => {
+    try {
+      setExporting(true);
+      const res = await api.get("/contacts/export/csv", {
+        params: {
+          status: statusFilter,
+          search: debouncedSearch,
+        },
+        responseType: "blob",
+      });
 
-    const rows = contacts.map((contact) => [
-      contact.name,
-      contact.email,
-      contact.phone,
-      contact.company,
-      contact.status,
-      contact.notes || "",
-      contact.createdAt,
-      contact.updatedAt,
-    ]);
+      const contentDisposition = res.headers["content-disposition"];
+      const filenameMatch = contentDisposition?.match(/filename="?([^"]+)"?/);
+      const filename = filenameMatch?.[1] || "rengy-contacts.csv";
+      const blob = new Blob([res.data], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-    const csv = [headers, ...rows]
-      .map((row) =>
-        row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(","),
-      )
-      .join("\n");
-
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "contacts.csv";
-    link.click();
-    URL.revokeObjectURL(url);
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      toast.success("Contacts CSV downloaded");
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Could not export contacts");
+    } finally {
+      setExporting(false);
+    }
   };
 
   const renderActivityPagination = ({
@@ -434,10 +429,11 @@ const Contacts = () => {
         <button
           type="button"
           onClick={exportCsv}
+          disabled={exporting}
           className="flex h-12 items-center justify-center gap-2 rounded-md border border-black bg-white px-4 font-bold text-black hover:bg-black hover:text-white"
         >
           <Download size={17} />
-          CSV
+          {exporting ? "Exporting" : "CSV"}
         </button>
       </div>
 

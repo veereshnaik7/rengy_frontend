@@ -2,6 +2,14 @@
 
 React frontend for the Mini CRM MERN application. It provides a complete authentication UI, protected dashboard routes, responsive contacts management, pagination, validation, contact activity logs, profile management, and CSV export.
 
+## Live Project Links
+
+- Live frontend URL: https://rengy-frontend-lake.vercel.app/
+- Live backend API URL: http://localhost:3000/api
+- Backend base URL: http://localhost:3000/
+- Frontend GitHub repository: https://github.com/veereshnaik7/rengy_frontend
+- Backend GitHub repository: https://github.com/veereshnaik7/rengy_backend
+
 ## Project Status
 
 This frontend currently implements the required assignment frontend features:
@@ -95,16 +103,23 @@ frontend/
 Create `frontend/.env`:
 
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=http://localhost:3000/api
 ```
 
 For deployment, set this to the live backend API:
 
 ```env
-VITE_API_URL=https://your-render-backend.onrender.com/api
+VITE_API_URL=http://localhost:3000/api
 ```
 
 ## Local Setup
+
+Local URLs:
+
+```txt
+Frontend dev server: http://localhost:5173
+Backend API server: http://localhost:3000/api
+```
 
 Install dependencies:
 
@@ -288,10 +303,12 @@ If a contact edit submits the same values, backend returns `No content changed`;
 
 ## CSV Export
 
-The Contacts Dashboard includes CSV export for the contacts currently loaded on the page.
+The Contacts Dashboard downloads CSV from the backend using the logged-in user's protected session. Export respects the current search and status filters, but it is not limited to the current 10-item page.
 
 Exported fields:
 
+- User ID
+- Contact ID
 - Name
 - Email
 - Phone
@@ -430,7 +447,11 @@ Current frontend tests cover:
 
 ### 1. Push Frontend To GitHub
 
-Create a GitHub repository for the frontend and push this frontend folder.
+Frontend repository:
+
+```txt
+https://github.com/veereshnaik7/rengy_frontend
+```
 
 ### 2. Create Vercel Project
 
@@ -455,7 +476,7 @@ dist
 In Vercel project settings:
 
 ```env
-VITE_API_URL=https://your-render-backend.onrender.com/api
+VITE_API_URL=http://localhost:3000/api
 ```
 
 ### 4. Update Backend CORS
@@ -463,10 +484,10 @@ VITE_API_URL=https://your-render-backend.onrender.com/api
 In Render backend env variables:
 
 ```env
-FRONTEND_URL=https://your-vercel-frontend.vercel.app
+FRONTEND_URL=https://rengy-frontend-lake.vercel.app
 ```
 
-This is required because the backend uses credentialed CORS and HTTP-only cookies.
+This value must not include a trailing slash because the backend checks the exact frontend origin for credentialed CORS and HTTP-only cookies.
 
 ### 5. Redeploy
 
@@ -517,13 +538,12 @@ Frontend requirements:
 
 Full project deliverables:
 
-- [ ] Live frontend URL
-- [ ] Live backend API URL
-- [ ] GitHub frontend repository
-- [ ] GitHub backend repository
+- [x] Live frontend URL: https://rengy-frontend-lake.vercel.app/
+- [x] Live backend API URL: https://rengy-backend-nrla.onrender.com/api
+- [x] GitHub frontend repository: https://github.com/veereshnaik7/rengy_frontend
+- [x] GitHub backend repository: https://github.com/veereshnaik7/rengy_backend
 - [x] Frontend README
 - [x] Backend README
-- [x] Postman collection or API documentation available in project
 
 ## Notes
 
@@ -533,4 +553,4 @@ Full project deliverables:
 - Contacts are loaded 10 per page.
 - Activity logs are opened per contact from the row-level Activity button.
 - Activity logs show exact changed fields.
-- CSV export exports the currently loaded contacts page.
+- CSV export downloads all matching contacts from the backend for the logged-in user.
